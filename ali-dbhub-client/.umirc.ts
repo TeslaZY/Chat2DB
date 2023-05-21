@@ -60,6 +60,11 @@ export default defineConfig({
               component: '@/pages/chat-ai'
             },
             {
+              path: '/chart',
+              exact: true,
+              component: '@/pages/chart'
+            },
+            {
               redirect: '/error',
             }
           ]

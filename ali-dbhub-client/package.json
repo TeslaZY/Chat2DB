@@ -29,6 +29,7 @@
     "@ant-design/pro-layout": "6.5.0",
     "@traptitech/markdown-it-katex": "^3.6.0",
     "antd": "4.23.2",
+    "echarts": "^5.3.3",
     "event-source-polyfill": "^1.0.31",
     "github-markdown-css": "^5.2.0",
     "highlight.js": "^11.7.0",

@@ -83,3 +83,23 @@ export function useOnlyOnceTask(fn: Function) {
     return lastData;
   }
 }
+
+export function useDOMMounted<E = Element>(callback: (element: E) => (() => void) | undefined | void) {
+  const resetRef = useRef<() => void>();
+  const ref = useRef<E | null>(null);
+  const onMounted = useCallback((e: E | null) => {
+    if (e) {
+      if (ref.current && e !== ref.current && resetRef.current) {
+        resetRef.current();
+      }
+      resetRef.current = callback(e) || undefined;
+    } else {
+      if (resetRef.current) {
+        resetRef.current();
+        resetRef.current = undefined;
+      }
+    }
+    ref.current = e;
+  }, []);
+  return [onMounted, ref] as [React.RefCallback<E>, React.RefObject<E>];
+}
