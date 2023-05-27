@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/alibaba/Chat2DB">
-    <img width="100" src="document/logo.ico">
+    <img width="100" src="document/image/logo.ico">
   </a>
 </p>
 <h1 align="center">Chat2DB</h1>
@@ -32,20 +32,21 @@
 ## ⏬ 下载安装
 | 描述                   | 下载地址                                                                                                                                                                                                                                       |
 |-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Windows               | [https://oss-chat2db.alibaba.com/release/1.0.3/Chat2DB%20Setup%201.0.3.exe](https://oss-chat2db.alibaba.com/release/1.0.3/Chat2DB%20Setup%201.0.3.exe) |
-| MacOS ARM64 (Apple芯片) | [https://oss-chat2db.alibaba.com/release/1.0.3/Chat2DB-1.0.3-arm64.dmg](https://oss-chat2db.alibaba.com/release/1.0.3/Chat2DB-1.0.3-arm64.dmg) |
-| MacOS X64 (Intel芯片)   | [https://oss-chat2db.alibaba.com/release/1.0.3/Chat2DB-1.0.3.dmg](https://oss-chat2db.alibaba.com/release/1.0.3/Chat2DB-1.0.3.dmg) |       
-| Jar包                  | [https://oss-chat2db.alibaba.com/release/1.0.3/ali-dbhub-server-start.jar](https://oss-chat2db.alibaba.com/release/1.0.3/ali-dbhub-server-start.jar) |                                                                                                                
+| Windows               | [https://oss-chat2db.alibaba.com/release/1.0.6/Chat2DB%20Setup%201.0.6.exe](https://oss-chat2db.alibaba.com/release/1.0.6/Chat2DB%20Setup%201.0.6.exe) |
+| MacOS ARM64 (Apple芯片) | [https://oss-chat2db.alibaba.com/release/1.0.6/Chat2DB-1.0.6-arm64.dmg](https://oss-chat2db.alibaba.com/release/1.0.6/Chat2DB-1.0.6-arm64.dmg) |
+| MacOS X64 (Intel芯片)   | [https://oss-chat2db.alibaba.com/release/1.0.6/Chat2DB-1.0.6.dmg](https://oss-chat2db.alibaba.com/release/1.0.6/Chat2DB-1.0.6.dmg) |       
+| Jar包                  | [https://oss-chat2db.alibaba.com/release/1.0.6/ali-dbhub-server-start.jar](https://oss-chat2db.alibaba.com/release/1.0.6/ali-dbhub-server-start.jar) |                                                                                                                
 
 ## 🌰 使用Demo
-- 创建数据源
-<a><img src="https://gw.alicdn.com/imgextra/i3/O1CN01PlpLYy1hIq5aMugpg_!!6000000004255-0-tps-3446-1750.jpg" width="100%"/></a>
-- 数据源管理
-<a><img src="https://gw.alicdn.com/imgextra/i2/O1CN01DpzZJL1T7w2Xv9VMl_!!6000000002336-0-tps-3410-1662.jpg" width="100%"/></a>
-- SQL控制台
-<a><img src="https://gw.alicdn.com/imgextra/i2/O1CN01aidnkx1Oo0LJ1Pdty_!!6000000001751-0-tps-3440-1736.jpg" width="100%"/></a>
-- AI智能助手
-<a><img src="https://gw.alicdn.com/imgextra/i4/O1CN01iaSXot1W6VeaDFbK2_!!6000000002739-0-tps-3430-1740.jpg" width="100%"/></a>
+### 创建数据源
+<a><img src="./document/image/img1.webp"/></a>
+
+### 数据源管理
+<a><img src="./document/image/img2.webp"/></a>
+
+### SQL控制台 及 AI智能助手
+<a><img src="./document/image/img3.webp"/></a>
+
 
 
 ## 📦 Docker部署
@@ -76,7 +77,7 @@ $ git clone git@github.com:alibaba/Chat2DB.git
 - 前端安装
 ```bash
 $ cd Chat2DB/ali-dbhub-client
-$ npm install # 安装npm 
+$ npm install # 安装前端依赖
 $ npm run build:prod # 把js打包生成到后端的source目录
 ```
 - 后端调试
@@ -85,7 +86,7 @@ $ cd ../ali-dbhub-server
 $ mvn clean install # 需要安装maven 3.8以上版本
 $ cd ali-dbhub-server/ali-dbhub-server-start/target/
 $ java -jar -Dchatgpt.apiKey=xxxxx ali-dbhub-server-start.jar  # 启动应用 chatgpt.apiKey 需要输入ChatGPT的key,如果不输入无法使用AIGC功能
-$ # 打开 http://localhost:7001 开启调试
+$ # 打开 http://127.0.0.1:10821 开启调试 注：需要进行前端安装
 ```
 
 - 前端调试
@@ -93,24 +94,29 @@ $ # 打开 http://localhost:7001 开启调试
 $ cd Chat2DB/ali-dbhub-client
 $ npm install 
 $ npm run start
-$ # 打开 http://localhost:8001 开启前端调试
+$ # 打开 http://127.0.0.1:10821 开启前端调试
+$ # 注：前端页面完全赖服务，所以前端同学调试也需要把后端项目跑起来
 ```
 但是前端调试需要映射下资源，可以下载[XSwitch](https://chrome.google.com/webstore/detail/idkjhjggpffolpidfkikidcokdkdaogg),添加以下配置文件
 ``` json
 {
   "proxy": [
     [
-      "http://127.0.0.1:7001/static/front/(.*)",
-      "http://127.0.0.1:8001/$1",
-    ],
-    [
-      "http://127.0.0.1:7001/(.*).js$",
+      "http://127.0.0.1:10821/(.*).js$",
       "http://127.0.0.1:8001/$1.js",
     ],
     [
-      "http://127.0.0.1:7001/(.*).css$",
+      "http://127.0.0.1:10821/(.*).css$",
       "http://127.0.0.1:8001/$1.css",
-    ]
+    ],
+    [
+      "http://127.0.0.1:10821/static/front/(.*)",
+      "http://127.0.0.1:8001/$1",
+    ],
+    [
+      "http://127.0.0.1:10821/static/(.*)$",
+      "http://127.0.0.1:8001/static/$1",
+    ],
   ],
 }
 ```
@@ -126,7 +132,8 @@ $ # 打开 http://localhost:8001 开启前端调试
 
 如果觉得对你有帮助请点个star吧。
 
-<a><img src="https://gw.alicdn.com/imgextra/i1/O1CN01VBaYST1MFzhUY9QP6_!!6000000001406-0-tps-723-731.jpg" width="40%"/></a>
+<a><img src="https://chat2db.oss-accelerate.aliyuncs.com/static/weichat.PNG" width="40%"/></a>
+
 
 微信：yxccw132  钉钉：9135032392
 
@@ -136,5 +143,6 @@ $ # 打开 http://localhost:8001 开启前端调试
 <a href="https://github.com/alibaba/ali-dbhub/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=alibaba/Chat2DB" />
 </a>
+
 
 

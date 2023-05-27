@@ -4,8 +4,8 @@
  */
 package com.alibaba.dbhub.server.domain.support.datasource;
 
-import java.net.MalformedURLException;
-import java.util.Objects;
+import java.net.URLClassLoader;
+import java.sql.Connection;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,16 +13,18 @@ import javax.sql.DataSource;
 
 import com.alibaba.dbhub.server.domain.support.enums.DriverTypeEnum;
 import com.alibaba.dbhub.server.domain.support.sql.ConnectInfo;
-import com.alibaba.dbhub.server.domain.support.sql.DbhubContext;
 import com.alibaba.dbhub.server.domain.support.sql.IDriverManager;
+import com.alibaba.fastjson2.JSON;
 
-import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ObjectUtils;
 
 /**
  * @author jipengfei
  * @version : DataSourceManger.java
  */
+@Slf4j
 public class DataSourceManger {
 
     protected static final ConcurrentHashMap<String, MyDataSource> DATA_SOURCE_MAP = new ConcurrentHashMap();
@@ -33,31 +35,31 @@ public class DataSourceManger {
         if (dataSource != null) {
             if (!connectInfo.equals(dataSource.getConnectInfo())) {
                 try {
-                    dataSource.close();
+                    dataSource.getHikariDataSource().close();
                     DATA_SOURCE_MAP.remove(key);
                 } catch (Exception e) {
                 }
             } else {
-                return dataSource;
+                return dataSource.getHikariDataSource();
             }
         }
         synchronized (key) {
             dataSource = DATA_SOURCE_MAP.get(key);
             if (dataSource != null) {
-                return dataSource;
+                return dataSource.getHikariDataSource();
             } else {
                 try {
                     dataSource = createDataSource(connectInfo);
                     DATA_SOURCE_MAP.put(key, dataSource);
-                    return dataSource;
-                } catch (MalformedURLException e) {
+                    return dataSource.getHikariDataSource();
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
         }
     }
 
-    private static MyDataSource createDataSource(ConnectInfo connectInfo) throws MalformedURLException {
+    private static MyDataSource createDataSource(ConnectInfo connectInfo) throws Exception {
         DriverTypeEnum driverTypeEnum = DriverTypeEnum.getDriver(connectInfo.getDbType(), connectInfo.getJdbc());
         ClassLoader classLoader = IDriverManager.getClassLoader(driverTypeEnum);
         //IDataSource dataSource = new IDataSource(connectInfo, driverTypeEnum, classLoader);
@@ -85,7 +87,10 @@ public class DataSourceManger {
         //}
         //return dataSource;
         Thread.currentThread().setContextClassLoader(classLoader);
-        MyDataSource myDataSource = new MyDataSource(connectInfo);
+        log.info("createDataSource classLoader  hashCode:{}"+ classLoader.hashCode());
+        log.info("createDataSource classLoader url :{}"+ JSON.toJSONString (((URLClassLoader)classLoader).getURLs()));
+        HikariDataSource myDataSource = (HikariDataSource)classLoader.loadClass("com.zaxxer.hikari.HikariDataSource")
+            .newInstance();
         myDataSource.setDriverClassName(driverTypeEnum.getDriverClass());
         myDataSource.setJdbcUrl(connectInfo.getUrl());
         myDataSource.setUsername(connectInfo.getUser());
@@ -102,7 +107,9 @@ public class DataSourceManger {
             properties.putAll(connectInfo.getExtendMap());
             myDataSource.setDataSourceProperties(properties);
         }
-        return myDataSource;
+        Connection connection = myDataSource.getConnection();
+        if (connection != null) {connection.close();}
+        return new MyDataSource(connectInfo, myDataSource);
     }
 
 
